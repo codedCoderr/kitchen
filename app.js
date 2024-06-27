@@ -11,6 +11,12 @@ require("dotenv").config({ path: `${process.cwd()}/.env` });
 const port = process.env.PORT || 3000;
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "Welcome to the Kitchen",
+  });
+});
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/menu", menuRouter);
 app.use("/api/v1/vendor", vendorRouter);
