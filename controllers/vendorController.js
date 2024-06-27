@@ -15,7 +15,7 @@ const viewVendorDetails = catchAsync(async (req, res, next) => {
   if (Number(existingVendor.userType) !== 1) {
     return next(new AppError("User is not a vendor", 400));
   }
-  res.status(201).json({
+  res.status(200).json({
     status: "success",
     data: existingVendor,
   });
