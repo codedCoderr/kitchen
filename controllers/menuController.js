@@ -2,6 +2,7 @@ const menu = require("../db/models/menu");
 const auth = require("./authController");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const user = require("../db/models/user");
 
 const createMenu = catchAsync(async (req, res, next) => {
   const body = req.body;
@@ -91,8 +92,18 @@ const listMenu = catchAsync(async (req, res, next) => {
   const isCustomer = auth.checkIsCustomer(req.user);
 
   if (isCustomer) {
-    const vendor = req.query.vendor;
-    menus = await menu.findAll({ where: { vendor } });
+    if (!req.query?.vendor) {
+      return next(new AppError("Vendor id is required", 400));
+    }
+    const vendor = await user.findByPk(req.query.vendor);
+
+    const isVendorACustomer = auth.checkIsCustomer(vendor);
+
+    if (isVendorACustomer) {
+      return next(new AppError("id provided is not a vendor", 400));
+    } else {
+      menus = await menu.findAll({ where: { vendor: req.query.vendor } });
+    }
   } else {
     menus = await menu.findAll({
       where: {

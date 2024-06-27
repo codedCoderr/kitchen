@@ -91,7 +91,6 @@ const restrictTo = (...userType) => {
 };
 
 const checkIsCustomer = (user) => {
-  console.log(user.userType);
   if (Number(user.userType) === 2) {
     return true;
   }
