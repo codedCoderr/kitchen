@@ -21,6 +21,7 @@ const sendErrorProd = (error, res) => {
     res.status(statusCode).json({
       status,
       message,
+      stack,
     });
   }
   return res.status(500).json({
