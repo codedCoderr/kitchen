@@ -3,7 +3,7 @@ const {
   viewVendorDetails,
   listVendors,
 } = require("../controllers/vendorController");
-const { authentication, restrictTo } = require("../controllers/authController");
+const { authentication, restrictTo } = require("../utils/auth");
 const router = Router();
 
 router.route("/:id").get(authentication, restrictTo("2"), viewVendorDetails);

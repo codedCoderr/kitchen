@@ -1,6 +1,6 @@
 "use strict";
 const { DataTypes } = require("sequelize");
-const sequelize = require("../../config/database");
+const sequelize = require("../../configs/database");
 
 module.exports = sequelize.define(
   "menus",
@@ -28,7 +28,7 @@ module.exports = sequelize.define(
       },
     },
     price: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
         notNull: { msg: "price cannot be null" },
