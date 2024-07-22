@@ -3,7 +3,6 @@ const catchAsync = require("../utils/catchAsync");
 
 const signup = catchAsync(async (req, res) => {
   const response = await authService.signup(req);
-  console.log(response);
   if (response.success) {
     res.status(response.status).json({
       message: response.message,
