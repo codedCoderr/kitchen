@@ -1,32 +1,29 @@
-const user = require("../db/models/user");
-const auth = require("./authController");
 const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/appError");
+const vendorService = require("../services/vendorService");
 
-const viewVendorDetails = catchAsync(async (req, res, next) => {
-  const vendorId = req.params.id;
-
-  const existingVendor = await user.findByPk(vendorId);
-
-  if (!existingVendor) {
-    return next(new AppError("Invalid vendor id", 400));
+const viewVendorDetails = catchAsync(async (req, res) => {
+  const response = await vendorService.viewVendorDetails(req);
+  if (response.success) {
+    res.status(response.status).json({
+      message: response.message,
+      data: response.data,
+    });
   }
-
-  if (Number(existingVendor.userType) !== 1) {
-    return next(new AppError("User is not a vendor", 400));
-  }
-  res.status(200).json({
-    status: "success",
-    data: existingVendor,
+  res.status(response.error).json({
+    message: response.message,
   });
 });
 
-const listVendors = catchAsync(async (req, res, next) => {
-  const vendors = await user.findAll({ where: { userType: "1" } });
-
-  res.status(200).json({
-    status: "success",
-    data: vendors,
+const listVendors = catchAsync(async (req, res) => {
+  const response = await vendorService.listVendors(req);
+  if (response.success) {
+    res.status(response.status).json({
+      message: response.message,
+      data: response.data,
+    });
+  }
+  res.status(response.error).json({
+    message: response.message,
   });
 });
 

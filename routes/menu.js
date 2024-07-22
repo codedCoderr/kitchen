@@ -6,7 +6,7 @@ const {
   listMenu,
   viewMenuDetails,
 } = require("../controllers/menuController");
-const { authentication, restrictTo } = require("../controllers/authController");
+const { authentication, restrictTo } = require("../utils/auth");
 const router = Router();
 
 router.route("/").post(authentication, restrictTo("1"), createMenu);
