@@ -31,7 +31,7 @@ const sendErrorProd = (error, res) => {
 
 const globalErrorHandler = (err, req, res, next) => {
   if (err.name === "SequelizeUniqueConstraintError") {
-    err = new AppError(err.errors[0].message, 400);
+    err = new AppError("Email must be unique", 400);
   }
 
   if (err.name === "SequelizeValidationError") {
