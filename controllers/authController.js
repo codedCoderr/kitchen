@@ -1,30 +1,37 @@
 const authService = require("../services/authService");
 const catchAsync = require("../utils/catchAsync");
+const responseService = require("../utils/response.service");
 
-const signup = catchAsync(async (req, res) => {
-  const response = await authService.signup(req);
-  if (response.success) {
-    res.status(response.status).json({
-      message: response.message,
-      token: response.data,
-    });
+const signup = catchAsync(async (req, res, next) => {
+  try {
+    const response = await authService.signup(req);
+
+    responseService.success(
+      res,
+      "Signup was successful",
+      responseService.statusCodes.created,
+      response,
+      "auth"
+    );
+  } catch (error) {
+    next(error);
   }
-  res.status(response.error).json({
-    message: response.message,
-  });
 });
 
-const login = catchAsync(async (req, res) => {
-  const response = await authService.login(req);
-  if (response.success) {
-    res.status(response.status).json({
-      message: response.message,
-      token: response.data,
-    });
+const login = catchAsync(async (req, res, next) => {
+  try {
+    const response = await authService.login(req);
+
+    responseService.success(
+      res,
+      "Login was successful",
+      responseService.statusCodes.ok,
+      response,
+      "auth"
+    );
+  } catch (error) {
+    next(error);
   }
-  res.status(response.error).json({
-    message: response.message,
-  });
 });
 
 module.exports = { signup, login };

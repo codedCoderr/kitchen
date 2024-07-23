@@ -12,67 +12,12 @@ const responseService = {
     serviceUnavailable: 503,
   },
 
-  success(message, data) {
-    return {
-      success: true,
-      message,
-      data,
-      status: this.statusCodes.ok,
-    };
-  },
-
-  error(message, error) {
-    return {
-      success: false,
-      message,
-      error,
-      status: this.statusCodes.badRequest,
-    };
-  },
-
-  unauthorizedError(message) {
-    return {
-      success: false,
-      message,
-      error: "Unauthorized",
-      status: this.statusCodes.unauthorized,
-    };
-  },
-
-  forbiddenError(message) {
-    return {
-      success: false,
-      message,
-      error: "Forbidden",
-      status: this.statusCodes.forbidden,
-    };
-  },
-
-  notFoundError(message) {
-    return {
-      success: false,
-      message,
-      error: "Not Found",
-      status: this.statusCodes.notFound,
-    };
-  },
-
-  internalServerError(message) {
-    return {
-      success: false,
-      message,
-      error: "Internal Server Error",
-      status: this.statusCodes.internalServerError,
-    };
-  },
-
-  serviceUnavailableError(message) {
-    return {
-      success: false,
-      message,
-      error: "Service Unavailable",
-      status: this.statusCodes.serviceUnavailable,
-    };
+  success(res, message, code, data, route) {
+    const responseObj = { message };
+    route === "auth" ? (responseObj.token = data) : (responseObj.data = data);
+    res.status(code).json({
+      ...responseObj,
+    });
   },
 };
 

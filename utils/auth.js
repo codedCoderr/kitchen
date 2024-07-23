@@ -1,6 +1,7 @@
 const catchAsync = require("./catchAsync");
 const jwt = require("jsonwebtoken");
 const user = require("../dbs/models/user");
+const AppError = require("./appError");
 
 const authentication = catchAsync(async (req, res, next) => {
   let idToken = "";
@@ -8,14 +9,14 @@ const authentication = catchAsync(async (req, res, next) => {
     idToken = req.headers.authorization.split(" ")[1];
   }
   if (!idToken) {
-    throw new Error("Please login to get access");
+    throw new AppError("Please login to get access");
   }
   const tokenDetail = jwt.verify(idToken, process.env.JWT_SECRET_KEY);
 
   const existingUser = await user.findByPk(tokenDetail.id);
 
   if (!existingUser) {
-    throw new Error("Invalid credentials");
+    throw new AppError("Invalid credentials");
   }
   req.user = existingUser;
   return next();
@@ -24,7 +25,10 @@ const authentication = catchAsync(async (req, res, next) => {
 const restrictTo = (...userType) => {
   const checkPermission = (req, res, next) => {
     if (!userType.includes(req.user.userType)) {
-      throw new Error("You don't have permission to perform this action", 403);
+      throw new AppError(
+        "You don't have permission to perform this action",
+        403
+      );
     }
     return next();
   };

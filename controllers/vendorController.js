@@ -1,30 +1,35 @@
 const catchAsync = require("../utils/catchAsync");
 const vendorService = require("../services/vendorService");
+const responseService = require("../utils/response.service");
 
-const viewVendorDetails = catchAsync(async (req, res) => {
-  const response = await vendorService.viewVendorDetails(req);
-  if (response.success) {
-    res.status(response.status).json({
-      message: response.message,
-      data: response.data,
-    });
+const viewVendorDetails = catchAsync(async (req, res, next) => {
+  try {
+    const response = await vendorService.viewVendorDetails(req);
+
+    responseService.success(
+      res,
+      "Vendor detail fetched successfully",
+      responseService.statusCodes.ok,
+      response
+    );
+  } catch (error) {
+    next(error);
   }
-  res.status(response.error).json({
-    message: response.message,
-  });
 });
 
-const listVendors = catchAsync(async (req, res) => {
-  const response = await vendorService.listVendors(req);
-  if (response.success) {
-    res.status(response.status).json({
-      message: response.message,
-      data: response.data,
-    });
+const listVendors = catchAsync(async (req, res, next) => {
+  try {
+    const response = await vendorService.listVendors(req);
+
+    responseService.success(
+      res,
+      "Vendors fetched successfully",
+      responseService.statusCodes.ok,
+      response
+    );
+  } catch (error) {
+    next(error);
   }
-  res.status(response.error).json({
-    message: response.message,
-  });
 });
 
 module.exports = {

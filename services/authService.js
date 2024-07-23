@@ -2,24 +2,19 @@ const user = require("../dbs/models/user");
 const bcrypt = require("bcrypt");
 const responseService = require("../utils/response.service");
 const auth = require("../utils/auth");
+const AppError = require("../utils/appError");
 
 const signup = async (req) => {
   const body = req.body;
   if (![2].includes(body.userType)) {
-    return responseService.error(
-      "Only users with userType->2 are allowed to signup",
+    throw new AppError(
+      "Only users with userType -> 2 are allowed to signup",
       responseService.statusCodes.badRequest
     );
   }
   const newUser = await user.create({
     ...body,
   });
-  if (!newUser) {
-    return responseService.error(
-      "Failed to created a new user",
-      responseService.statusCodes.badRequest
-    );
-  }
 
   const result = newUser.toJSON();
 
@@ -28,13 +23,13 @@ const signup = async (req) => {
 
   result.token = auth.generateToken({ id: result.id });
 
-  return responseService.success("Signup was successful", result.token);
+  return result.token;
 };
 
 const login = async (req) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return responseService.error(
+    throw new AppError(
       "Incomplete input",
       responseService.statusCodes.badRequest
     );
@@ -47,13 +42,12 @@ const login = async (req) => {
     !existingUser ||
     !(await bcrypt.compare(password, existingUser.password))
   ) {
-    return responseService.error(
+    throw new AppError(
       "Invalid login details",
       responseService.statusCodes.unauthorized
     );
   } else {
-    const token = auth.generateToken({ id: existingUser.id });
-    return responseService.success("Login was successful", token);
+    return auth.generateToken({ id: existingUser.id });
   }
 };
 

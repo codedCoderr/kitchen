@@ -1,69 +1,79 @@
 const menuService = require("../services/menuService");
 const catchAsync = require("../utils/catchAsync");
+const responseService = require("../utils/response.service");
 
-const createMenu = catchAsync(async (req, res) => {
-  const response = await menuService.createMenu(req);
-  if (response.success) {
-    res.status(response.status).json({
-      message: response.message,
-      data: response.data,
-    });
+const createMenu = catchAsync(async (req, res, next) => {
+  try {
+    const response = await menuService.createMenu(req);
+
+    responseService.success(
+      res,
+      "Menu created successfully",
+      responseService.statusCodes.created,
+      response
+    );
+  } catch (error) {
+    next(error);
   }
-  res.status(response.error).json({
-    message: response.message,
-  });
 });
 
-const updateMenu = catchAsync(async (req, res) => {
-  const response = await menuService.updateMenu(req);
-  if (response.success) {
-    res.status(response.status).json({
-      message: response.message,
-      data: response.data,
-    });
+const updateMenu = catchAsync(async (req, res, next) => {
+  try {
+    const response = await menuService.updateMenu(req);
+
+    responseService.success(
+      res,
+      "Menu updated successfully",
+      responseService.statusCodes.ok,
+      response
+    );
+  } catch (error) {
+    next(error);
   }
-  res.status(response.error).json({
-    message: response.message,
-  });
 });
 
-const deleteMenu = catchAsync(async (req, res) => {
-  const response = await menuService.deleteMenu(req);
-  if (response.success) {
-    res.status(response.status).json({
-      message: response.message,
-      data: response.data,
-    });
+const deleteMenu = catchAsync(async (req, res, next) => {
+  try {
+    await menuService.deleteMenu(req);
+
+    responseService.success(
+      res,
+      "Menu deleted successfully",
+      responseService.statusCodes.noContent
+    );
+  } catch (error) {
+    next(error);
   }
-  res.status(response.error).json({
-    message: response.message,
-  });
 });
 
-const viewMenuDetails = catchAsync(async (req, res) => {
-  const response = await menuService.viewMenuDetails(req);
-  if (response.success) {
-    res.status(response.status).json({
-      message: response.message,
-      data: response.data,
-    });
+const viewMenuDetails = catchAsync(async (req, res, next) => {
+  try {
+    const response = await menuService.viewMenuDetails(req);
+
+    responseService.success(
+      res,
+      "Menu details fetched successfully",
+      responseService.statusCodes.ok,
+      response
+    );
+  } catch (error) {
+    next(error);
   }
-  res.status(response.error).json({
-    message: response.message,
-  });
 });
 
-const listMenu = catchAsync(async (req, res) => {
-  const response = await menuService.listMenu(req);
-  if (response.success) {
-    res.status(response.status).json({
-      message: response.message,
-      data: response.data,
-    });
+const listMenu = catchAsync(async (req, res, next) => {
+  try {
+    const response = await menuService.listMenu(req);
+
+    responseService.success(
+      res,
+      "Vendor's menus fetched successfully",
+      responseService.statusCodes.ok,
+      response
+    );
+  } catch (error) {
+    next(error);
   }
-  res.status(response.error).json({
-    message: response.message,
-  });
 });
 
 module.exports = {

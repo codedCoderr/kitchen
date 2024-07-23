@@ -1,5 +1,6 @@
 const user = require("../dbs/models/user");
 const responseService = require("../utils/response.service");
+const AppError = require("../utils/appError");
 
 const viewVendorDetails = async (req) => {
   const vendorId = req.params.id;
@@ -7,28 +8,23 @@ const viewVendorDetails = async (req) => {
   const existingVendor = await user.findByPk(vendorId);
 
   if (!existingVendor) {
-    return responseService.error(
+    throw new AppError(
       "Invalid vendor id",
       responseService.statusCodes.notFound
     );
   }
 
   if (Number(existingVendor.userType) !== 1) {
-    return responseService.error(
-      "User is not a vendor",
+    throw new AppError(
+      "ID provided is not a vendor id",
       responseService.statusCodes.notFound
     );
   }
-  return responseService.success(
-    "Vendor detail was fetched successfully",
-    existingVendor
-  );
+  return existingVendor;
 };
 
 const listVendors = async (req) => {
-  const vendors = await user.findAll({ where: { userType: "1" } });
-
-  return responseService.success("Vendors fetched successfully", vendors);
+  return user.findAll({ where: { userType: "1" } });
 };
 
 module.exports = {

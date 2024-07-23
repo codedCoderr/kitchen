@@ -2,22 +2,15 @@ const menu = require("../dbs/models/menu");
 const auth = require("../utils/auth");
 const user = require("../dbs/models/user");
 const responseService = require("../utils/response.service");
+const AppError = require("../utils/appError");
 
 const createMenu = async (req) => {
   const body = req.body;
 
-  const newMenu = await menu.create({
+  return menu.create({
     ...body,
     vendor: req.user.id,
   });
-
-  if (!newMenu) {
-    return responseService.error(
-      "Failed to created a new menu",
-      responseService.statusCodes.badRequest
-    );
-  }
-  return responseService.success("Menu created successfully", newMenu);
 };
 
 const updateMenu = async (req) => {
@@ -27,16 +20,12 @@ const updateMenu = async (req) => {
   const body = req.body;
 
   const existingMenu = await menu.findByPk(menuId);
-
   if (!existingMenu) {
-    return responseService.error(
-      "Invalid menu id",
-      responseService.statusCodes.notFound
-    );
+    throw new AppError("Invalid menu id", responseService.statusCodes.notFound);
   }
 
   if (Number(existingMenu.vendor) !== userId) {
-    return responseService.error(
+    throw new AppError(
       "You can only update a menu you created as a vendor",
       responseService.statusCodes.badRequest
     );
@@ -44,7 +33,7 @@ const updateMenu = async (req) => {
 
   const updatedMenu = await existingMenu.update({ ...body });
 
-  return responseService.error("Menu updated successfully", updatedMenu);
+  return updatedMenu;
 };
 
 const deleteMenu = async (req) => {
@@ -55,21 +44,17 @@ const deleteMenu = async (req) => {
   const existingMenu = await menu.findByPk(menuId);
 
   if (!existingMenu) {
-    return responseService.error(
-      "Invalid menu id",
-      responseService.statusCodes.notFound
-    );
+    throw new AppError("Invalid menu id", responseService.statusCodes.notFound);
   }
 
   if (Number(existingMenu.vendor) !== userId) {
-    return responseService.error(
+    throw new AppError(
       "You can only delete a menu you created as a vendor",
       responseService.statusCodes.forbidden
     );
   }
 
   await existingMenu.destroy();
-  return responseService.success("Record deleted successfully");
 };
 
 const viewMenuDetails = async (req) => {
@@ -78,15 +63,9 @@ const viewMenuDetails = async (req) => {
   const existingMenu = await menu.findByPk(menuId);
 
   if (!existingMenu) {
-    return responseService.error(
-      "Invalid menu id",
-      responseService.statusCodes.notFound
-    );
+    throw new AppError("Invalid menu id", responseService.statusCodes.notFound);
   }
-  return responseService.error(
-    "Menu details fetched successfully",
-    existingMenu
-  );
+  return existingMenu;
 };
 
 const listMenu = async (req) => {
@@ -95,23 +74,23 @@ const listMenu = async (req) => {
 
   if (isCustomer) {
     if (!req.query?.vendor) {
-      return responseService.error(
+      throw new AppError(
         "Vendor id is required",
         responseService.statusCodes.badRequest
       );
     }
     const vendor = await user.findByPk(req.query.vendor);
     if (!vendor) {
-      return responseService.error(
-        "Invalid vendor id provided",
+      throw new AppError(
+        "Invalid vendor id",
         responseService.statusCodes.notFound
       );
     }
     const isVendorACustomer = auth.checkIsCustomer(vendor);
 
     if (isVendorACustomer) {
-      return responseService.error(
-        "id provided is not a vendor",
+      throw new AppError(
+        "ID provided is not a vendor id",
         responseService.statusCodes.notFound
       );
     } else {
@@ -125,7 +104,7 @@ const listMenu = async (req) => {
     });
   }
 
-  return responseService.success("Vendor's menus fetched successfully", menus);
+  return menus;
 };
 
 module.exports = {
